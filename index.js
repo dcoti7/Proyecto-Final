@@ -15,21 +15,16 @@ const app = express();
 app.use(express.json());//para usar respuestas tipo json
 app.use(cors());
 
-app.get('/',(req, res) =>{
-    res.send('hola mundo');
-});
-
-app.use('/citas',citasRouter);
-app.use('/historial',historialRouter);
-app.use('/horariosCitas',horariosCitasRouter);
-app.use('/horarios',horariosRouter);
+app.use('/personas',personasRouter);
+app.use('/usuarios',usuariosRouter);
 app.use('/medicos',medicosRouter);
 app.use('/pacientes',pacientesRouter);
-app.use('/personas',personasRouter);
-app.use('/recetas',recetasRouter);
 app.use('/salas',salasRouter);
-app.use('/usuarios',usuariosRouter);
-
+app.use('/horarios',horariosRouter);
+app.use('/horariosCitas',horariosCitasRouter);
+app.use('/citas',citasRouter);
+app.use('/historial',historialRouter);
+app.use('/recetas',recetasRouter);
 
 app.listen(6500, () =>{
     console.log('servidor activo');
