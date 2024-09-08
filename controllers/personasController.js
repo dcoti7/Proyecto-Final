@@ -1,11 +1,10 @@
 import { db } from "../database/conexion.js"; // agregar .js
 
-class CitasController{
+class PersonasController{
 
-    
     consultar (req, res){
         try {
-            db.query('select * from tbl_cita',
+            db.query('select * from tbl_persona',
                 (err, data) =>{
                     if (err){
                         res.status(400).send(err);
@@ -22,7 +21,7 @@ class CitasController{
     consultarId(req, res){
         const {id} = req.params;
         try{
-            db.query('select * from tbl_cita where idCita = ?',
+            db.query('select * from tbl_persona where idPersona = ?',
                 [id],
                 (err, data) =>{
                     if (err){
@@ -39,10 +38,10 @@ class CitasController{
 
     ingresar (req, res){
         try{
-            const { idPaciente, idHorarioCita, fechaRegistro, motivo, estado} = req.body;
+            const { nombre, apellido, fechaNac, email, numero, DPI } = req.body;
             //query: un proceso de ejecucion de operacion
-            db.query('insert into tbl_cita (idPaciente, idHorarioCita, fechaRegistro, motivo, estado) values(?, ?, ?, ?, ?);',
-                [idPaciente, idHorarioCita, fechaRegistro, motivo,estado], (err, rows) =>{
+            db.query('insert into tbl_persona (nombre, apellido, fechaNac, email, numero,DPI) values(?, ?, ?, ?, ?, ?);',
+                [nombre, apellido, fechaNac, email,numero, DPI], (err, rows) =>{
                     if (err){
                         res.status(400).send(err);
                     }
@@ -58,9 +57,9 @@ class CitasController{
     actualizar(req, res){
         const { id } = req.params;
         try{
-            const { idPaciente, idHorarioCita, fechaRegistro, motivo, estado } = req.body;
-            db.query('update tbl_cita set idPaciente = ?, idHorarioCita = ?, fechaRegistro = ?, motivo = ?, estado = ? where idCita = ?',
-                [idPaciente, idHorarioCita, fechaRegistro, motivo, estado], (err, rows) =>{
+            const { nombre, apellido, fechaNac, email, numero,DPI } = req.body;
+            db.query('update tbl_persona set nombre = ?, apellido = ?, fechaNac = ?, email = ?, numero = ?, DPI = ? where idPersona = ?',
+                [nombre, apellido, fechaNac, email, numero, DPI], (err, rows) =>{
                     if (err){
                         res.status(400).send(err);
                     }
@@ -76,7 +75,7 @@ class CitasController{
     borrar(req, res){
         const { id } = req.params;
         try{
-            db.query('delete from tbl_cita where idCita = ?;',
+            db.query('delete from tbl_persona where idPersona = ?;',
                 [id], (err, rows) =>{
                     if (err){
                         res.status(400).send(err);
@@ -91,4 +90,4 @@ class CitasController{
     
 }
 
-export const citas = new CitasController();
+export const personas = new PersonasController();
