@@ -4,7 +4,7 @@ class RecetasController{
     
     consultar(req, res) {
         try {
-            db.query('SELECT * FROM tbl_receta', (err, data) => {
+            db.query('SELECT * FROM receta', (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
                 }
@@ -24,10 +24,10 @@ class RecetasController{
     
     ingresar(req, res) {
         try {
-            const { medicamento, dosis, frecuencia, duracion, idCita } = req.body;
+            const { idCita, descripcion } = req.body;
     
             // Validaciones de entrada
-            if (!medicamento || !dosis || !frecuencia || !duracion || !idCita) {
+            if (!idCita || !descripcion) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
@@ -37,13 +37,13 @@ class RecetasController{
             }
     
             // Validaciones de longitud de texto (opcional, ajustar según requerimientos)
-            if (medicamento.length > 100 || dosis.length > 100 || frecuencia.length > 100 || duracion.length > 100) {
+            /* if (medicamento.length > 100 || dosis.length > 100 || frecuencia.length > 100 || duracion.length > 100) {
                 return res.status(400).json({ error: "El medicamento, dosis, frecuencia y duración deben tener máximo 100 caracteres." });
-            }
+            } */
     
             // Inserción
-            db.query('INSERT INTO tbl_receta(medicamento, dosis, frecuencia, duracion, idCita) VALUES(?, ?, ?, ?, ?);',
-                [medicamento, dosis, frecuencia, duracion, idCita],
+            db.query('INSERT INTO receta(idCita, descripcion) VALUES(?, ?);',
+                [idCita, descripcion],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea
@@ -66,10 +66,10 @@ class RecetasController{
         const { id } = req.params;
     
         try {
-            const { medicamento, dosis, frecuencia, duracion, idCita } = req.body;
+            const { idCita, descripcion } = req.body;
     
             // Validaciones de entrada
-            if (!medicamento || !dosis || !frecuencia || !duracion || !idCita) {
+            if (!idCita || !descripcion) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
@@ -79,13 +79,13 @@ class RecetasController{
             }
     
             // Validaciones de longitud de texto
-            if (medicamento.length > 100 || dosis.length > 100 || frecuencia.length > 100 || duracion.length > 100) {
+           /*  if (medicamento.length > 100 || dosis.length > 100 || frecuencia.length > 100 || duracion.length > 100) {
                 return res.status(400).json({ error: "El medicamento, dosis, frecuencia y duración deben tener máximo 100 caracteres." });
-            }
+            } */
     
             // Actualización
-            db.query('UPDATE tbl_receta SET medicamento = ?, dosis = ?, frecuencia = ?, duracion = ?, idCita = ? WHERE idReceta = ?',
-                [medicamento, dosis, frecuencia, duracion, idCita, id],
+            db.query('UPDATE receta SET idCita = ?, descripcion = ? WHERE idReceta = ?',
+                [idCita, descripcion, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });
@@ -115,7 +115,7 @@ class RecetasController{
             }
     
             // Consulta por ID
-            db.query('SELECT * FROM tbl_receta WHERE idReceta = ?',
+            db.query('SELECT * FROM receta WHERE idReceta = ?',
                 [id],
                 (err, data) => {
                     if (err) {
@@ -146,7 +146,7 @@ class RecetasController{
             }
     
             // Borrar el registro
-            db.query('DELETE FROM tbl_receta WHERE idReceta = ?;',
+            db.query('DELETE FROM receta WHERE idReceta = ?;',
                 [id],
                 (err, rows) => {
                     if (err) {

@@ -4,7 +4,7 @@ class UsuariosController{
 
     consultar(req, res) {
         try {
-            db.query('SELECT * FROM tbl_usuario', (err, data) => {
+            db.query('SELECT * FROM usuario', (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
                 }
@@ -24,31 +24,31 @@ class UsuariosController{
     
     ingresar(req, res) {
         try {
-            const { username, idPersona, idRol } = req.body;
+            const { username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado } = req.body;
     
             // Validaciones de entrada
-            if (!username || !idPersona || !idRol) {
-                return res.status(400).json({ error: "Los campos username, idPersona y idRol son requeridos." });
+            if (!username || !password || !dpi || !nombres || !apellidos || !fechaNacimiento || !email || !numero || !idRol || !estado) {
+                return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
             // Validar que idPersona e idRol sean números
-            if (isNaN(idPersona) || isNaN(idRol)) {
+            /* if (isNaN(idPersona) || isNaN(idRol)) {
                 return res.status(400).json({ error: "Los campos idPersona e idRol deben ser números." });
-            }
+            } */
     
             // Validar longitud de username
-            if (username.length > 50) {
+           /*  if (username.length > 50) {
                 return res.status(400).json({ error: "El username debe tener máximo 50 caracteres." });
-            }
+            } */
     
             // Inserción
-            db.query('INSERT INTO tbl_usuario(username, idPersona, idRol) VALUES(?, ?, ?);',
-                [username, idPersona, idRol],
+            db.query('INSERT INTO usuario(username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
+                [username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea o duplicación
                         if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-                            return res.status(400).json({ error: "El idPersona o idRol no existen en las tablas correspondientes." });
+                            return res.status(400).json({ error: "El idRol no existen en la tabla scorrespondiente." });
                         }
                         if (err.code === 'ER_DUP_ENTRY') {
                             return res.status(400).json({ error: "El username ya está registrado." });
@@ -69,31 +69,31 @@ class UsuariosController{
         const { id } = req.params;
     
         try {
-            const { username, idPersona, idRol } = req.body;
+            const { username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado } = req.body;
     
             // Validaciones de entrada
-            if (!username || !idPersona || !idRol) {
-                return res.status(400).json({ error: "Los campos username, idPersona y idRol son requeridos." });
+            if (!username || !password || !dpi || !nombres || !apellidos || !fechaNacimiento || !email || !numero || !idRol || !estado) {
+                return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
             // Validar que idPersona, idRol e id sean números
-            if (isNaN(idPersona) || isNaN(idRol) || isNaN(id)) {
+           /*  if (isNaN(idPersona) || isNaN(idRol) || isNaN(id)) {
                 return res.status(400).json({ error: "Los campos idPersona, idRol e id deben ser números." });
-            }
+            } */
     
             // Validar longitud de username
-            if (username.length > 50) {
+           /*  if (username.length > 50) {
                 return res.status(400).json({ error: "El username debe tener máximo 50 caracteres." });
-            }
+            } */
     
             // Actualización
-            db.query('UPDATE tbl_usuario SET username = ?, idPersona = ?, idRol = ? WHERE idUsuario = ?',
+            db.query('UPDATE usuario SET username = ?, password = ?, dpi = ? nombres = ? apellidos = ? fechaNacimiento = ? email = ? numero = ? idRol = ? estado = ? WHERE idUsuario = ?',
                 [username, idPersona, idRol, id],
                 (err, rows) => {
                     if (err) {
                         // Manejo de errores de clave foránea o duplicación
                         if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-                            return res.status(400).json({ error: "El idPersona o idRol no existen en las tablas correspondientes." });
+                            return res.status(400).json({ error: "idRol no existen en las tablas correspondientes." });
                         }
                         if (err.code === 'ER_DUP_ENTRY') {
                             return res.status(400).json({ error: "El username ya está registrado." });
@@ -125,7 +125,7 @@ class UsuariosController{
             }
     
             // Consulta por ID
-            db.query('SELECT * FROM tbl_usuario WHERE idUsuario = ?',
+            db.query('SELECT * FROM usuario WHERE idUsuario = ?',
                 [id],
                 (err, data) => {
                     if (err) {
@@ -156,7 +156,7 @@ class UsuariosController{
             }
     
             // Borrar el registro
-            db.query('DELETE FROM tbl_usuario WHERE idUsuario = ?;',
+            db.query('DELETE FROM usuario WHERE idUsuario = ?;',
                 [id],
                 (err, rows) => {
                     if (err) {

@@ -4,7 +4,7 @@ class HorariosController{
 
     consultar(req, res) {
         try {
-            db.query('SELECT * FROM tbl_horario', (err, data) => {
+            db.query('SELECT * FROM horario', (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
                 }
@@ -24,10 +24,10 @@ class HorariosController{
     
     ingresar(req, res) {
         try {
-            const { horaInicio, horaFin, idMedico, idSala } = req.body;
+            const { idMedico, idSala, fechaCita } = req.body;
     
             // Validaciones de entrada
-            if (!horaInicio || !horaFin || !idMedico || !idSala) {
+            if (!idMedico || !idSala || !fechaCita) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
@@ -37,14 +37,14 @@ class HorariosController{
             }
     
             // Validar que horaInicio y horaFin tengan el formato correcto (HH:MM:SS)
-            const horaRegex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+            /* const horaRegex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
             if (!horaRegex.test(horaInicio) || !horaRegex.test(horaFin)) {
                 return res.status(400).json({ error: "El formato de la hora debe ser HH:MM:SS." });
-            }
+            } */
     
             // Inserción
-            db.query('INSERT INTO tbl_horario(horaInicio, horaFin, idMedico, idSala) VALUES(?, ?, ?, ?);',
-                [horaInicio, horaFin, idMedico, idSala],
+            db.query('INSERT INTO horario(idMedico, idSala, fechaCita) VALUES(?, ?, ?);',
+                [idMedico, idSala, fechaCita],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea
@@ -67,10 +67,10 @@ class HorariosController{
         const { id } = req.params;
     
         try {
-            const { horaInicio, horaFin, idMedico, idSala } = req.body;
+            const { idMedico, idSala, fechaCita } = req.body;
     
             // Validaciones de entrada
-            if (!horaInicio || !horaFin || !idMedico || !idSala) {
+            if (!idMedico || !idSala || !fechaCita) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
@@ -80,14 +80,14 @@ class HorariosController{
             }
     
             // Validar que horaInicio y horaFin tengan el formato correcto (HH:MM:SS)
-            const horaRegex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+            /* const horaRegex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
             if (!horaRegex.test(horaInicio) || !horaRegex.test(horaFin)) {
                 return res.status(400).json({ error: "El formato de la hora debe ser HH:MM:SS." });
-            }
+            } */
     
             // Actualización
-            db.query('UPDATE tbl_horario SET horaInicio = ?, horaFin = ?, idMedico = ?, idSala = ? WHERE idHorario = ?',
-                [horaInicio, horaFin, idMedico, idSala, id],
+            db.query('UPDATE horario SET idMedico = ?, idSala = ?, fechaCita = ? WHERE idHorario = ?',
+                [idMedico, idSala, fechaCita, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });
@@ -117,7 +117,7 @@ class HorariosController{
             }
     
             // Consulta por ID
-            db.query('SELECT * FROM tbl_horario WHERE idHorario = ?',
+            db.query('SELECT * FROM horario WHERE idHorario = ?',
                 [id],
                 (err, data) => {
                     if (err) {
@@ -148,7 +148,7 @@ class HorariosController{
             }
     
             // Borrar el registro
-            db.query('DELETE FROM tbl_horario WHERE idHorario = ?;',
+            db.query('DELETE FROM horario WHERE idHorario = ?;',
                 [id],
                 (err, rows) => {
                     if (err) {

@@ -1,10 +1,10 @@
 import { db } from "../database/conexion.js"; // agregar .js
 
-class HorariosCitasController{
-
+class EspecialidadController{
+    
     consultar(req, res) {
         try {
-            db.query('SELECT * FROM tbl_horarioCita', (err, data) => {
+            db.query('SELECT * FROM Especialidad', (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
                 }
@@ -24,40 +24,29 @@ class HorariosCitasController{
     
     ingresar(req, res) {
         try {
-            const { fecha, estado, idHorario } = req.body;
+            const { nombre, idPadre } = req.body;
     
             // Validaciones de entrada
-            if (!fecha || estado === undefined || !idHorario) {
+            if (!nombre || !idPadre ) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
-            // Validar que idHorario sea un número
-            if (isNaN(idHorario)) {
-                return res.status(400).json({ error: "El idHorario debe ser un número." });
-            }
+           /*  if (isNaN(idMedico) || isNaN(idPaciente) || isNaN(idHorario)) {
+                return res.status(400).json({ error: "idMedico, idPaciente y idHorario deben ser números." });
+            } */
     
-            // Validar que el estado sea un booleano (true o false)
-            if (typeof estado !== 'boolean') {
-                return res.status(400).json({ error: "El estado debe ser un valor booleano (true o false)." });
-            }
-    
-            // Validar que la fecha esté en formato correcto (YYYY-MM-DD)
-            const fechaRegex = /^\d{4}-\d{2}-\d{2}$/;
-            if (!fechaRegex.test(fecha)) {
-                return res.status(400).json({ error: "El formato de la fecha debe ser YYYY-MM-DD." });
-            }
     
             // Inserción
-            db.query('INSERT INTO tbl_horarioCita(fecha, estado, idHorario) VALUES(?, ?, ?);',
-                [fecha, estado, idHorario],
+            db.query('INSERT INTO Especialidad (nombre, idPadre) VALUES(?, ?);',
+                [idMedico, idPaciente, idHorario, estado],
                 (err, rows) => {
-                    if (err) {
+                    /* if (err) {
                         // Verificar si es un error de clave foránea
                         if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-                            return res.status(400).json({ error: "El idHorario no existe en la tabla correspondiente." });
+                            return res.status(400).json({ error: "El idMedico, idPaciente o idHorario no existen en las tablas correspondientes." });
                         }
                         return res.status(400).json({ error: "Error al insertar el registro.", details: err });
-                    }
+                    } */
                     if (rows.affectedRows === 1) {
                         return res.status(200).json({ respuesta: "Registro ingresado con éxito" });
                     }
@@ -67,37 +56,26 @@ class HorariosCitasController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
-
+    
     actualizar(req, res) {
         const { id } = req.params;
     
         try {
-            const { fecha, estado, idHorario } = req.body;
+            const { nombre, idPadre } = req.body;
     
             // Validaciones de entrada
-            if (!fecha || estado === undefined || !idHorario) {
+            if (!nombre || !idPadre) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
-            // Validar que idHorario e id sean números
-            if (isNaN(idHorario) || isNaN(id)) {
-                return res.status(400).json({ error: "El idHorario y id deben ser números." });
+           /*  if (isNaN(idMedico) || isNaN(idPaciente) || isNaN(idHorario) || isNaN(id)) {
+                return res.status(400).json({ error: "idMedico, idPaciente, idHorario e id deben ser números." });
             }
-    
-            // Validar que el estado sea booleano
-            if (typeof estado !== 'boolean') {
-                return res.status(400).json({ error: "El estado debe ser un valor booleano (true o false)." });
-            }
-    
-            // Validar formato de fecha (YYYY-MM-DD)
-            const fechaRegex = /^\d{4}-\d{2}-\d{2}$/;
-            if (!fechaRegex.test(fecha)) {
-                return res.status(400).json({ error: "El formato de la fecha debe ser YYYY-MM-DD." });
-            }
+     */
     
             // Actualización
-            db.query('UPDATE tbl_horarioCita SET fecha = ?, estado = ?, idHorario = ? WHERE idHorarioCita = ?',
-                [fecha, estado, idHorario, id],
+            db.query('UPDATE Especialidad SET nombre = ?, idPadre = ? WHERE idEspecialidad = ?',
+                [idMedico, idPaciente, idHorario, estado, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });
@@ -116,7 +94,7 @@ class HorariosCitasController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
-    
+
     consultarId(req, res) {
         const { id } = req.params;
     
@@ -127,7 +105,7 @@ class HorariosCitasController{
             }
     
             // Consulta por ID
-            db.query('SELECT * FROM tbl_horarioCita WHERE idHorarioCita = ?',
+            db.query('SELECT * FROM Especialidad WHERE idEspecialidad = ?',
                 [id],
                 (err, data) => {
                     if (err) {
@@ -147,7 +125,7 @@ class HorariosCitasController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
-    
+
     borrar(req, res) {
         const { id } = req.params;
     
@@ -158,7 +136,7 @@ class HorariosCitasController{
             }
     
             // Borrar el registro
-            db.query('DELETE FROM tbl_horarioCita WHERE idHorarioCita = ?;',
+            db.query('DELETE FROM Especialidad WHERE idEspecialidad = ?;',
                 [id],
                 (err, rows) => {
                     if (err) {
@@ -177,8 +155,8 @@ class HorariosCitasController{
         } catch (err) {
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
-    }
+    } 
     
 }
 
-export const horariosCitas = new HorariosCitasController();
+export const especialidad = new EspecialidadController();

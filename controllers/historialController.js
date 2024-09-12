@@ -4,7 +4,7 @@ class HistorialController{
 
     consultar(req, res) {
         try {
-            db.query('SELECT * FROM tbl_historial', (err, data) => {
+            db.query('SELECT * FROM historial', (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
                 }
@@ -24,26 +24,26 @@ class HistorialController{
 
     ingresar(req, res) {
         try {
-            const { diagnostico, idReceta } = req.body;
+            const { idPaciente, idCita } = req.body;
     
             // Validaciones de entrada
-            if (!diagnostico || !idReceta) {
+            if (!idPaciente || !idCita) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
             // Validar que idReceta sea un número
-            if (isNaN(idReceta)) {
-                return res.status(400).json({ error: "El idReceta debe ser un número." });
+            if (isNaN(idPaciente) || isNaN(idCita)) {
+                return res.status(400).json({ error: "El idPaciente e idCita debe ser un número." });
             }
     
             // Consulta de inserción
-            db.query('INSERT INTO tbl_historial (diagnostico, idReceta) VALUES(?, ?);',
-                [diagnostico, idReceta],
+            db.query('INSERT INTO historial (idPaciente, idCita) VALUES(?, ?);',
+                [idPaciente, idCita],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea
                         if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-                            return res.status(400).json({ error: "El idReceta no existe en la tabla correspondiente." });
+                            return res.status(400).json({ error: "El idPaciente o idCita no existe en la tabla correspondiente." });
                         }
                         return res.status(400).json({ error: "Error al insertar el registro.", details: err });
                     }
@@ -61,21 +61,21 @@ class HistorialController{
         const { id } = req.params;
     
         try {
-            const { diagnostico, idReceta } = req.body;
+            const { idPaciente, idCita } = req.body;
     
             // Validaciones de entrada
-            if (!diagnostico || !idReceta) {
+            if (!idPaciente || !idCita) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
             // Validar que idReceta y id sean números
-            if (isNaN(idReceta) || isNaN(id)) {
-                return res.status(400).json({ error: "El idReceta e id deben ser números." });
+            if (isNaN(idPaciente) || isNaN(idCita) || isNaN(id)) {
+                return res.status(400).json({ error: "El idPaciente,idCita e id deben ser números." });
             }
     
             // Consulta de actualización
-            db.query('UPDATE tbl_historial SET diagnostico = ?, idReceta = ? WHERE idHistorial = ?',
-                [diagnostico, idReceta, id],
+            db.query('UPDATE historial SET idPaciente = ?, idCita = ? WHERE idHistorial = ?',
+                [idPaciente, idCita, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });
@@ -105,7 +105,7 @@ class HistorialController{
             }
     
             // Consulta por ID
-            db.query('SELECT * FROM tbl_historial WHERE idHistorial = ?',
+            db.query('SELECT * FROM historial WHERE idHistorial = ?',
                 [id],
                 (err, data) => {
                     if (err) {
@@ -136,7 +136,7 @@ class HistorialController{
             }
     
             // Borrar el registro
-            db.query('DELETE FROM tbl_historial WHERE idHistorial = ?;',
+            db.query('DELETE FROM historial WHERE idHistorial = ?;',
                 [id],
                 (err, rows) => {
                     if (err) {

@@ -4,7 +4,7 @@ class SalasController{
     
     consultar(req, res) {
         try {
-            db.query('SELECT * FROM tbl_sala', (err, data) => {
+            db.query('SELECT * FROM salaConsulta', (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
                 }
@@ -24,21 +24,21 @@ class SalasController{
     
     ingresar(req, res) {
         try {
-            const { nombreSala, ubicacion } = req.body;
+            const { nivel } = req.body;
     
             // Validaciones de entrada
-            if (!nombreSala || !ubicacion) {
-                return res.status(400).json({ error: "Los campos nombreSala y ubicacion son requeridos." });
+            if (!nivel) {
+                return res.status(400).json({ error: "El campo nivel es requerido." });
             }
     
             // Validaciones de longitud de texto (opcional, ajustar según requerimientos)
-            if (nombreSala.length > 100) {
+            /* if (nombreSala.length > 100) {
                 return res.status(400).json({ error: "El nombreSala debe tener máximo 100 caracteres." });
-            }
+            } */
     
             // Inserción
-            db.query('INSERT INTO tbl_sala (nombreSala, ubicacion) VALUES(?, ?);',
-                [nombreSala, ubicacion],
+            db.query('INSERT INTO salaConsulta (nivel) VALUES(?);',
+                [nivel],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al insertar el registro.", details: err });
@@ -57,20 +57,20 @@ class SalasController{
         const { id } = req.params;
     
         try {
-            const { nombreSala, ubicacion } = req.body;
+            const { nivel } = req.body;
     
             // Validaciones de entrada
-            if (!nombreSala || !ubicacion) {
-                return res.status(400).json({ error: "Los campos nombreSala y ubicacion son requeridos." });
+            if (!nivel) {
+                return res.status(400).json({ error: "El campo nivel es requerido." });
             }
     
             // Validaciones de longitud de texto
-            if (nombreSala.length > 100) {
+            /* if (nombreSala.length > 100) {
                 return res.status(400).json({ error: "El nombreSala debe tener máximo 100 caracteres." });
-            }
+            } */
     
             // Actualización
-            db.query('UPDATE tbl_sala SET nombreSala = ?, ubicacion = ? WHERE idSala = ?',
+            db.query('UPDATE salaConsulta SET nivel = ? WHERE idSalaConsulta = ?',
                 [nombreSala, ubicacion, id],
                 (err, rows) => {
                     if (err) {
@@ -101,7 +101,7 @@ class SalasController{
             }
     
             // Consulta por ID
-            db.query('SELECT * FROM tbl_sala WHERE idSala = ?',
+            db.query('SELECT * FROM salaConsulta WHERE idSalaConsulta = ?',
                 [id],
                 (err, data) => {
                     if (err) {
@@ -132,7 +132,7 @@ class SalasController{
             }
     
             // Borrar el registro
-            db.query('DELETE FROM tbl_sala WHERE idSala = ?;',
+            db.query('DELETE FROM salaConsulta WHERE idSalaConsulta = ?;',
                 [id],
                 (err, rows) => {
                     if (err) {

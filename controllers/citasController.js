@@ -4,7 +4,7 @@ class CitasController{
     
     consultar(req, res) {
         try {
-            db.query('SELECT * FROM tbl_cita', (err, data) => {
+            db.query('SELECT * FROM cita', (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
                 }
@@ -24,30 +24,26 @@ class CitasController{
     
     ingresar(req, res) {
         try {
-            const { idPaciente, idHorarioCita, fechaRegistro, motivo, estado } = req.body;
+            const { idMedico, idPaciente, idHorario, estado } = req.body;
     
             // Validaciones de entrada
-            if (!idPaciente || !idHorarioCita || !fechaRegistro || !motivo || !estado) {
+            if (!idMedico || !idPaciente || !idHorario || !estado ) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
-            if (isNaN(idPaciente) || isNaN(idHorarioCita)) {
-                return res.status(400).json({ error: "idPaciente y idHorarioCita deben ser números." });
+            if (isNaN(idMedico) || isNaN(idPaciente) || isNaN(idHorario)) {
+                return res.status(400).json({ error: "idMedico, idPaciente y idHorario deben ser números." });
             }
     
-            const fechaRegex = /^\d{4}-\d{2}-\d{2}$/;
-            if (!fechaRegex.test(fechaRegistro)) {
-                return res.status(400).json({ error: "El formato de la fecha debe ser YYYY-MM-DD." });
-            }
     
             // Inserción
-            db.query('INSERT INTO tbl_cita (idPaciente, idHorarioCita, fechaRegistro, motivo, estado) VALUES(?, ?, ?, ?, ?);',
-                [idPaciente, idHorarioCita, fechaRegistro, motivo, estado],
+            db.query('INSERT INTO cita (idMedico, idPaciente, idHorario, estado) VALUES(?, ?, ?, ?);',
+                [idMedico, idPaciente, idHorario, estado],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea
                         if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-                            return res.status(400).json({ error: "El idPaciente o idHorarioCita no existen en las tablas correspondientes." });
+                            return res.status(400).json({ error: "El idMedico, idPaciente o idHorario no existen en las tablas correspondientes." });
                         }
                         return res.status(400).json({ error: "Error al insertar el registro.", details: err });
                     }
@@ -65,25 +61,21 @@ class CitasController{
         const { id } = req.params;
     
         try {
-            const { idPaciente, idHorarioCita, fechaRegistro, motivo, estado } = req.body;
+            const { idMedico, idPaciente, idHorario, estado } = req.body;
     
             // Validaciones de entrada
-            if (!idPaciente || !idHorarioCita || !fechaRegistro || !motivo || !estado) {
+            if (!idMedico || !idPaciente || !idHorario || !estado) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
-            if (isNaN(idPaciente) || isNaN(idHorarioCita) || isNaN(id)) {
-                return res.status(400).json({ error: "idPaciente, idHorarioCita e id deben ser números." });
+            if (isNaN(idMedico) || isNaN(idPaciente) || isNaN(idHorario) || isNaN(id)) {
+                return res.status(400).json({ error: "idMedico, idPaciente, idHorario e id deben ser números." });
             }
     
-            const fechaRegex = /^\d{4}-\d{2}-\d{2}$/;
-            if (!fechaRegex.test(fechaRegistro)) {
-                return res.status(400).json({ error: "El formato de la fecha debe ser YYYY-MM-DD." });
-            }
     
             // Actualización
-            db.query('UPDATE tbl_cita SET idPaciente = ?, idHorarioCita = ?, fechaRegistro = ?, motivo = ?, estado = ? WHERE idCita = ?',
-                [idPaciente, idHorarioCita, fechaRegistro, motivo, estado, id],
+            db.query('UPDATE cita SET idMedico = ?, idPaciente = ?, idHorario = ?, estado = ? WHERE idCita = ?',
+                [idMedico, idPaciente, idHorario, estado, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });
@@ -113,7 +105,7 @@ class CitasController{
             }
     
             // Consulta por ID
-            db.query('SELECT * FROM tbl_cita WHERE idCita = ?',
+            db.query('SELECT * FROM cita WHERE idCita = ?',
                 [id],
                 (err, data) => {
                     if (err) {
@@ -144,7 +136,7 @@ class CitasController{
             }
     
             // Borrar el registro
-            db.query('DELETE FROM tbl_cita WHERE idCita = ?;',
+            db.query('DELETE FROM cita WHERE idCita = ?;',
                 [id],
                 (err, rows) => {
                     if (err) {

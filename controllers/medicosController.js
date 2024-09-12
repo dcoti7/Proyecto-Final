@@ -4,7 +4,7 @@ class MedicosController{
 
     consultar(req, res) {
         try {
-            db.query('SELECT * FROM tbl_medico', (err, data) => {
+            db.query('SELECT * FROM medico', (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
                 }
@@ -24,26 +24,26 @@ class MedicosController{
 
     ingresar(req, res) {
         try {
-            const { especialidad, idUsuario } = req.body;
+            const { idEspecialidad, idUsuario } = req.body;
     
             // Validaciones de entrada
-            if (!especialidad || !idUsuario) {
+            if (!idEspecialidad || !idUsuario) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
             // Validar que idUsuario sea un número
-            if (isNaN(idUsuario)) {
-                return res.status(400).json({ error: "El idUsuario debe ser un número." });
+            if (isNaN(idEspecialidad) || isNaN(idUsuario)) {
+                return res.status(400).json({ error: "El idUsuario e idEspecialidad debe ser un número." });
             }
     
             // Inserción
-            db.query('INSERT INTO tbl_medico (especialidad, idUsuario) VALUES(?, ?);',
-                [especialidad, idUsuario],
+            db.query('INSERT INTO medico (idEspecialidad, idUsuario) VALUES(?, ?);',
+                [idEspecialidad, idUsuario],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea
                         if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-                            return res.status(400).json({ error: "El idUsuario no existe en la tabla correspondiente." });
+                            return res.status(400).json({ error: "El idUsuario o idEspecialidad no existe en la tabla correspondiente." });
                         }
                         return res.status(400).json({ error: "Error al insertar el registro.", details: err });
                     }
@@ -61,21 +61,21 @@ class MedicosController{
         const { id } = req.params;
     
         try {
-            const { especialidad, idUsuario } = req.body;
+            const { idEspecialidad, idUsuario } = req.body;
     
             // Validaciones de entrada
-            if (!especialidad || !idUsuario) {
+            if (!idEspecialidad || !idUsuario) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
             // Validar que idUsuario e id sean números
-            if (isNaN(idUsuario) || isNaN(id)) {
-                return res.status(400).json({ error: "El idUsuario y id deben ser números." });
+            if (isNaN(idEspecialidad) || isNaN(idUsuario) || isNaN(id)) {
+                return res.status(400).json({ error: "El idUsuario, idEspecialidad y id deben ser números." });
             }
     
             // Actualización
-            db.query('UPDATE tbl_medico SET especialidad = ?, idUsuario = ? WHERE idMedico = ?',
-                [especialidad, idUsuario, id],
+            db.query('UPDATE medico SET idEspecialidad = ?, idUsuario = ? WHERE idMedico = ?',
+                [idEspecialidad, idUsuario, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });
@@ -105,7 +105,7 @@ class MedicosController{
             }
     
             // Consulta por ID
-            db.query('SELECT * FROM tbl_medico WHERE idMedico = ?',
+            db.query('SELECT * FROM medico WHERE idMedico = ?',
                 [id],
                 (err, data) => {
                     if (err) {
@@ -136,7 +136,7 @@ class MedicosController{
             }
     
             // Borrar el registro
-            db.query('DELETE FROM tbl_medico WHERE idMedico = ?;',
+            db.query('DELETE FROM medico WHERE idMedico = ?;',
                 [id],
                 (err, rows) => {
                     if (err) {
