@@ -1,14 +1,14 @@
 import express from "express";
-import { historial } from "../controllers/especialidadController.js";
+import { especialidad } from "../controllers/especialidadController.js";
 export const especialidadRouter = express.Router();
 
-historialRouter
+especialidadRouter
     .route("/")
-    .post(historial.ingresar)
-    .get(historial.consultar)
+    .post(especialidad.ingresar)
+    .get(especialidad.consultar)
 
-historialRouter
+especialidadRouter
     .route("/:id")
-    .get(historial.consultarId)
-    .put(historial.actualizar)
-    .delete(historial.borrar)
+    .get(especialidad.consultarId)
+    .put(especialidad.actualizar)
+    .delete(especialidad.borrar)

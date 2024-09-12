@@ -38,7 +38,7 @@ class EspecialidadController{
     
             // Inserción
             db.query('INSERT INTO Especialidad (nombre, idPadre) VALUES(?, ?);',
-                [idMedico, idPaciente, idHorario, estado],
+                [nombre, idPadre],
                 (err, rows) => {
                     /* if (err) {
                         // Verificar si es un error de clave foránea
@@ -75,7 +75,7 @@ class EspecialidadController{
     
             // Actualización
             db.query('UPDATE Especialidad SET nombre = ?, idPadre = ? WHERE idEspecialidad = ?',
-                [idMedico, idPaciente, idHorario, estado, id],
+                [nombre, idPadre, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });
