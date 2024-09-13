@@ -24,11 +24,11 @@ class EspecialidadController{
     
     ingresar(req, res) {
         try {
-            const { nombre, idPadre } = req.body;
+            const { nombre } = req.body;
     
             // Validaciones de entrada
-            if (!nombre || !idPadre ) {
-                return res.status(400).json({ error: "Todos los campos son requeridos." });
+            if (!nombre ) {
+                return res.status(400).json({ error: "El campo nombre es requerido." });
             }
     
            /*  if (isNaN(idMedico) || isNaN(idPaciente) || isNaN(idHorario)) {
@@ -37,7 +37,7 @@ class EspecialidadController{
     
     
             // Inserción
-            db.query('INSERT INTO Especialidad (nombre, idPadre) VALUES(?, ?);',
+            db.query('INSERT INTO Especialidad (nombre) VALUES(?);',
                 [nombre, idPadre],
                 (err, rows) => {
                     /* if (err) {
@@ -61,11 +61,11 @@ class EspecialidadController{
         const { id } = req.params;
     
         try {
-            const { nombre, idPadre } = req.body;
+            const { nombre } = req.body;
     
             // Validaciones de entrada
             if (!nombre || !idPadre) {
-                return res.status(400).json({ error: "Todos los campos son requeridos." });
+                return res.status(400).json({ error: "El campo nombre es requerido" });
             }
     
            /*  if (isNaN(idMedico) || isNaN(idPaciente) || isNaN(idHorario) || isNaN(id)) {
@@ -74,8 +74,8 @@ class EspecialidadController{
      */
     
             // Actualización
-            db.query('UPDATE Especialidad SET nombre = ?, idPadre = ? WHERE idEspecialidad = ?',
-                [nombre, idPadre, id],
+            db.query('UPDATE Especialidad SET nombre = ? WHERE idEspecialidad = ?',
+                [nombre, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });
