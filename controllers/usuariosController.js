@@ -87,8 +87,8 @@ class UsuariosController{
             } */
     
             // Actualización
-            db.query('UPDATE usuario SET username = ?, password = ?, dpi = ? nombres = ? apellidos = ? fechaNacimiento = ? email = ? numero = ? idRol = ? estado = ? WHERE idUsuario = ?',
-                [username, idPersona, idRol, id],
+            db.query('UPDATE usuario SET username = ?, password = ?, dpi = ?, nombres = ?, apellidos = ?, fechaNacimiento = ?, email = ?, numero = ?, idRol = ?, estado = ? WHERE idUsuario = ?',
+                [username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado, id],
                 (err, rows) => {
                     if (err) {
                         // Manejo de errores de clave foránea o duplicación

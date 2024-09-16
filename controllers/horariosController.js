@@ -24,10 +24,10 @@ class HorariosController{
     
     ingresar(req, res) {
         try {
-            const { idMedico, idSala, fechaCita } = req.body;
+            const { idMedico, idSala } = req.body;
     
             // Validaciones de entrada
-            if (!idMedico || !idSala || !fechaCita) {
+            if (!idMedico || !idSala ) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
@@ -43,8 +43,8 @@ class HorariosController{
             } */
     
             // Inserción
-            db.query('INSERT INTO horario(idMedico, idSala, fechaCita) VALUES(?, ?, ?);',
-                [idMedico, idSala, fechaCita],
+            db.query('INSERT INTO horario(idMedico, idSala) VALUES(?, ?);',
+                [idMedico, idSala],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea
@@ -67,10 +67,10 @@ class HorariosController{
         const { id } = req.params;
     
         try {
-            const { idMedico, idSala, fechaCita } = req.body;
+            const { idMedico, idSala } = req.body;
     
             // Validaciones de entrada
-            if (!idMedico || !idSala || !fechaCita) {
+            if (!idMedico || !idSala ) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
@@ -86,8 +86,8 @@ class HorariosController{
             } */
     
             // Actualización
-            db.query('UPDATE horario SET idMedico = ?, idSala = ?, fechaCita = ? WHERE idHorario = ?',
-                [idMedico, idSala, fechaCita, id],
+            db.query('UPDATE horario SET idMedico = ?, idSala = ? WHERE idHorario = ?',
+                [idMedico, idSala, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });

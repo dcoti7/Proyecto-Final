@@ -24,10 +24,10 @@ class CitasController{
     
     ingresar(req, res) {
         try {
-            const { idMedico, idPaciente, idHorario, estado } = req.body;
+            const { idMedico, idPaciente, idHorario, estado, fechaCita } = req.body;
     
             // Validaciones de entrada
-            if (!idMedico || !idPaciente || !idHorario || !estado ) {
+            if (!idMedico || !idPaciente || !idHorario || !estado || !fechaCita ) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
@@ -37,8 +37,8 @@ class CitasController{
     
     
             // Inserción
-            db.query('INSERT INTO cita (idMedico, idPaciente, idHorario, estado) VALUES(?, ?, ?, ?);',
-                [idMedico, idPaciente, idHorario, estado],
+            db.query('INSERT INTO cita (idMedico, idPaciente, idHorario, estado, fechaCita) VALUES(?, ?, ?, ?, ?);',
+                [idMedico, idPaciente, idHorario, estado, fechaCita],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea
@@ -61,10 +61,10 @@ class CitasController{
         const { id } = req.params;
     
         try {
-            const { idMedico, idPaciente, idHorario, estado } = req.body;
+            const { idMedico, idPaciente, idHorario, estado, fechaCita } = req.body;
     
             // Validaciones de entrada
-            if (!idMedico || !idPaciente || !idHorario || !estado) {
+            if (!idMedico || !idPaciente || !idHorario || !estado || !fechaCita) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
     
@@ -74,8 +74,8 @@ class CitasController{
     
     
             // Actualización
-            db.query('UPDATE cita SET idMedico = ?, idPaciente = ?, idHorario = ?, estado = ? WHERE idCita = ?',
-                [idMedico, idPaciente, idHorario, estado, id],
+            db.query('UPDATE cita SET idMedico = ?, idPaciente = ?, idHorario = ?, estado = ?, fechaCita = ? WHERE idCita = ?',
+                [idMedico, idPaciente, idHorario, estado, fechaCita, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });

@@ -71,7 +71,7 @@ class SalasController{
     
             // Actualización
             db.query('UPDATE salaConsulta SET nivel = ? WHERE idSalaConsulta = ?',
-                [nombreSala, ubicacion, id],
+                [nivel, id],
                 (err, rows) => {
                     if (err) {
                         return res.status(400).json({ error: "Error al actualizar el registro.", details: err });

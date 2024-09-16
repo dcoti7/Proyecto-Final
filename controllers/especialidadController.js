@@ -38,7 +38,7 @@ class EspecialidadController{
     
             // Inserción
             db.query('INSERT INTO Especialidad (nombre) VALUES(?);',
-                [nombre, idPadre],
+                [nombre],
                 (err, rows) => {
                     /* if (err) {
                         // Verificar si es un error de clave foránea
@@ -64,7 +64,7 @@ class EspecialidadController{
             const { nombre } = req.body;
     
             // Validaciones de entrada
-            if (!nombre || !idPadre) {
+            if (!nombre) {
                 return res.status(400).json({ error: "El campo nombre es requerido" });
             }
     
