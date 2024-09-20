@@ -7,6 +7,7 @@ usuariosRouter
   .post(usuarios.ingresar)
   .get(usuarios.consultar);
 
+usuariosRouter.post('/login', usuarios.login);
 
 usuariosRouter
   .route("/:id")

@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { db } from "../database/conexion.js"; // agregar .js
 
 class UsuariosController{
@@ -22,33 +23,26 @@ class UsuariosController{
         }
     }
     
-    ingresar(req, res) {
+    async ingresar(req, res) {
         try {
             const { username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado } = req.body;
-    
+
             // Validaciones de entrada
             if (!username || !password || !dpi || !nombres || !apellidos || !fechaNacimiento || !email || !numero || !idRol || !estado) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
-    
-            // Validar que idPersona e idRol sean números
-            /* if (isNaN(idPersona) || isNaN(idRol)) {
-                return res.status(400).json({ error: "Los campos idPersona e idRol deben ser números." });
-            } */
-    
-            // Validar longitud de username
-           /*  if (username.length > 50) {
-                return res.status(400).json({ error: "El username debe tener máximo 50 caracteres." });
-            } */
-    
-            // Inserción
+
+            // Encriptar la contraseña antes de guardarla
+            const hashedPassword = await bcrypt.hash(password, 10); // 10 es el número de rondas de encriptación (puede ajustarse)
+
+            // Inserción con la contraseña encriptada
             db.query('INSERT INTO usuario(username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
-                [username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado],
+                [username, hashedPassword, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado],
                 (err, rows) => {
                     if (err) {
                         // Verificar si es un error de clave foránea o duplicación
                         if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-                            return res.status(400).json({ error: "El idRol no existen en la tabla scorrespondiente." });
+                            return res.status(400).json({ error: "El idRol no existen en la tabla correspondiente." });
                         }
                         if (err.code === 'ER_DUP_ENTRY') {
                             return res.status(400).json({ error: "El username ya está registrado." });
@@ -176,6 +170,52 @@ class UsuariosController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
+
+    async login(req, res) {
+        const { username, password } = req.body;
+
+        // Validar que ambos campos estén presentes
+        if (!username || !password) {
+            return res.status(400).json({ error: "Username y contraseña son requeridos." });
+        }
+
+        try {
+            // Buscar el usuario en la base de datos por el username
+            db.query('SELECT * FROM usuario WHERE username = ?', [username], async (err, data) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar la base de datos.", details: err });
+                }
+
+                // Verificar si el usuario existe
+                if (data.length === 0) {
+                    return res.status(404).json({ error: "Usuario no encontrado." });
+                }
+
+                const usuario = data[0];
+
+                // Asegurarse de que el campo 'password' exista
+                if (!usuario.password) {
+                    return res.status(500).json({ error: "Error interno: no se pudo recuperar la contraseña del usuario." });
+                }
+
+                // Comparar la contraseña ingresada con la encriptada
+                const match = await bcrypt.compare(password, usuario.password);
+
+                if (!match) {
+                    return res.status(401).json({ error: "Contraseña incorrecta." });
+                }
+
+                // Si la contraseña coincide, excluir el campo 'password' y 'estado' antes de devolver el objeto de usuario
+                const { password: userPassword, estado, ...userWithoutPasswordAndEstado } = usuario;
+
+                return res.status(200).json({ mensaje: "Inicio de sesión exitoso", usuario: userWithoutPasswordAndEstado });
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
+
     
 }
 

@@ -13,6 +13,8 @@ const app = express();
 app.use(express.json());//para usar respuestas tipo json
 app.use(cors());
 
+
+
 app.use('/especialidad',especialidadRouter);
 app.use('/salas',salasRouter);
 app.use('/usuarios',usuariosRouter);
