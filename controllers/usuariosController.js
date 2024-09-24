@@ -173,47 +173,68 @@ class UsuariosController{
 
     async login(req, res) {
         const { username, password } = req.body;
-
+    
         // Validar que ambos campos estén presentes
         if (!username || !password) {
             return res.status(400).json({ error: "Username y contraseña son requeridos." });
         }
-
+    
         try {
-            // Buscar el usuario en la base de datos por el username
-            db.query('SELECT * FROM usuario WHERE username = ?', [username], async (err, data) => {
+            // Buscar el usuario en la base de datos solo obteniendo el username, password e idRol
+            db.query('SELECT username, password, idRol FROM usuario WHERE username = ?', [username], async (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la base de datos.", details: err });
                 }
-
+    
                 // Verificar si el usuario existe
                 if (data.length === 0) {
                     return res.status(404).json({ error: "Usuario no encontrado." });
                 }
-
+    
                 const usuario = data[0];
-
+    
                 // Asegurarse de que el campo 'password' exista
                 if (!usuario.password) {
                     return res.status(500).json({ error: "Error interno: no se pudo recuperar la contraseña del usuario." });
                 }
-
+    
                 // Comparar la contraseña ingresada con la encriptada
                 const match = await bcrypt.compare(password, usuario.password);
-
+    
                 if (!match) {
                     return res.status(401).json({ error: "Contraseña incorrecta." });
                 }
-
-                // Si la contraseña coincide, excluir el campo 'password' y 'estado' antes de devolver el objeto de usuario
-                const { password: userPassword, estado, ...userWithoutPasswordAndEstado } = usuario;
-
-                return res.status(200).json({ mensaje: "Inicio de sesión exitoso", usuario: userWithoutPasswordAndEstado });
+    
+                // Si la contraseña coincide, devolver únicamente el idRol
+                return res.status(200).json({ idRol: usuario.idRol });
             });
         } catch (err) {
             return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
         }
     }
+    
+
+    consultarPacientes(req, res) {
+        try {
+            // Consulta para obtener solo los usuarios que sean de tipo paciente 
+            db.query('SELECT * FROM usuario WHERE idRol = ?', [1], (err, data) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar la tabla.", details: err });
+                }
+    
+                // Verificar si hay usuarios con el rol de paciente
+                if (data.length === 0) {
+                    return res.status(200).json({ mensaje: "No existen pacientes registrados en la tabla." });
+                }
+    
+                // Si hay usuarios, devolverlos
+                return res.status(200).json(data);
+            });
+        } catch (err) {
+            return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+    
 
 
     

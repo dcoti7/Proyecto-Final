@@ -156,6 +156,38 @@ class MedicosController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
+
+    async obtenerMedicos(req, res) {
+        try {
+            // Consulta SQL para obtener la información de los médicos
+            const sql = `
+                SELECT 
+                    m.idMedico, 
+                    CONCAT(uMedico.nombres, " ", uMedico.apellidos) AS Medico 
+                FROM 
+                    medico m 
+                JOIN 
+                    usuario uMedico ON m.idUsuario = uMedico.idUsuario;
+            `;
+
+            // Realizar la consulta a la base de datos
+            db.query(sql, (err, results) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar los médicos.", details: err });
+                }
+
+                // Verificar si hay resultados
+                if (results.length === 0) {
+                    return res.status(200).json({ mensaje: "No hay médicos disponibles." });
+                }
+
+                // Devolver los resultados de la consulta
+                return res.status(200).json(results);
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
     
 }
 

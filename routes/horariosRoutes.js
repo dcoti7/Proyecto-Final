@@ -7,6 +7,7 @@ horariosRouter
   .post(horarios.ingresar)
   .get(horarios.consultar);
 
+horariosRouter.get('/obtenerHorarios', horarios.obtenerHorarios);
 
 horariosRouter
   .route("/:id")

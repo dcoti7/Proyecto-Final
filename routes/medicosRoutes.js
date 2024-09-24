@@ -7,7 +7,7 @@ medicosRouter
   .post(medicos.ingresar)
   .get(medicos.consultar);
 
-
+medicosRouter.get('/consultarMedico', medicos.obtenerMedicos);
 medicosRouter
   .route("/:id")
   .get(medicos.consultarId)

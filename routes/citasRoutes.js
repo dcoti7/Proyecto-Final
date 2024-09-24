@@ -7,6 +7,8 @@ citasRouter
     .get(citas.consultar)
     .post(citas.ingresar)
 
+citasRouter.get('/obtenerCitas', citas.obtenerCitas);
+
 citasRouter
     .route("/:id")
     .get(citas.consultarId)

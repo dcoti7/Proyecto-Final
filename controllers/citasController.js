@@ -156,6 +156,52 @@ class CitasController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     } 
+
+
+    async obtenerCitas(req, res) {
+        try {
+            // Consulta SQL para obtener la información de las citas
+            const sql = `
+                SELECT 
+                    c.idCita, 
+                    CONCAT(p.nombres, " ", p.apellidos) AS Paciente, 
+                    CONCAT(uMedico.nombres, " ", uMedico.apellidos) AS Medico, 
+                    c.fechaCita, 
+                    c.estado 
+                FROM 
+                    cita c 
+                JOIN 
+                    usuario p ON c.idPaciente = p.idUsuario 
+                JOIN 
+                    medico m ON c.idMedico = m.idMedico 
+                JOIN 
+                    usuario uMedico ON m.idUsuario = uMedico.idUsuario 
+                JOIN 
+                    horario h ON c.idHorario = h.idHorario;
+            `;
+
+            // Realizar la consulta a la base de datos
+            db.query(sql, (err, results) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar las citas.", details: err });
+                }
+
+                // Verificar si hay resultados
+                if (results.length === 0) {
+                    return res.status(200).json({ mensaje: "No hay citas disponibles." });
+                }
+
+                // Devolver los resultados de la consulta
+                return res.status(200).json(results);
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
+
+
+
     
 }
 

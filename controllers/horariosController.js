@@ -168,6 +168,44 @@ class HorariosController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
+
+    async obtenerHorarios(req, res) {
+        try {
+            // Consulta SQL para obtener la información de los horarios
+            const sql = `
+                SELECT 
+                    h.idHorario, 
+                    CONCAT(uMedico.nombres, ' ', uMedico.apellidos) AS Medico, 
+                    CONCAT('Sala ', h.idSala, ' Nivel ', s.nivel) AS Sala 
+                FROM 
+                    horario h 
+                JOIN 
+                    medico m ON m.idMedico = h.idMedico 
+                JOIN 
+                    usuario uMedico ON uMedico.idUsuario = m.idUsuario 
+                JOIN 
+                    salaconsulta s ON s.idSalaConsulta = h.idSala;
+            `;
+
+            // Realizar la consulta a la base de datos
+            db.query(sql, (err, results) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar los horarios.", details: err });
+                }
+
+                // Verificar si hay resultados
+                if (results.length === 0) {
+                    return res.status(200).json({ mensaje: "No hay horarios disponibles." });
+                }
+
+                // Devolver los resultados de la consulta
+                return res.status(200).json(results);
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
     
 }
 
