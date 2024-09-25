@@ -159,28 +159,31 @@ class MedicosController{
 
     async obtenerMedicos(req, res) {
         try {
-            // Consulta SQL para obtener la información de los médicos
+            // Consulta SQL para obtener la información de los médicos y sus especialidades
             const sql = `
                 SELECT 
                     m.idMedico, 
-                    CONCAT(uMedico.nombres, " ", uMedico.apellidos) AS Medico 
+                    CONCAT(uMedico.nombres, " ", uMedico.apellidos) AS Medico,
+                    e.nombre AS Especialidad
                 FROM 
                     medico m 
                 JOIN 
-                    usuario uMedico ON m.idUsuario = uMedico.idUsuario;
+                    usuario uMedico ON m.idUsuario = uMedico.idUsuario
+                JOIN
+                    Especialidad e ON m.idEspecialidad = e.idEspecialidad;
             `;
-
+    
             // Realizar la consulta a la base de datos
             db.query(sql, (err, results) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar los médicos.", details: err });
                 }
-
+    
                 // Verificar si hay resultados
                 if (results.length === 0) {
                     return res.status(200).json({ mensaje: "No hay médicos disponibles." });
                 }
-
+    
                 // Devolver los resultados de la consulta
                 return res.status(200).json(results);
             });

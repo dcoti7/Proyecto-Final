@@ -7,7 +7,7 @@ recetasRouter
   .post(recetas.ingresar)
   .get(recetas.consultar);
 
-
+recetasRouter.get('/obtenerRecetas', recetas.obtenerRecetas);
 recetasRouter
   .route("/:id")
   .get(recetas.consultarId)

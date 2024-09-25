@@ -166,7 +166,42 @@ class RecetasController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
+
+    obtenerRecetas(req, res) {
+        try {
+            // Consulta SQL para obtener las recetas y la información del paciente
+            const sql = `
+                SELECT 
+                    r.idReceta, 
+                    c.idCita,  
+                    CONCAT(p.nombres, " ", p.apellidos) AS Paciente, 
+                    r.descripcion 
+                FROM 
+                    receta r
+                JOIN 
+                    cita c ON r.idCita = c.idCita
+                JOIN 
+                    usuario p ON c.idPaciente = p.idUsuario;
+            `;
     
+            // Ejecutar la consulta en la base de datos
+            db.query(sql, (err, results) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar las recetas.", details: err });
+                }
+    
+                // Verificar si hay resultados
+                if (results.length === 0) {
+                    return res.status(200).json({ mensaje: "No hay recetas disponibles." });
+                }
+    
+                // Devolver los resultados de la consulta
+                return res.status(200).json(results);
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
 }
 
 export const recetas = new RecetasController();
