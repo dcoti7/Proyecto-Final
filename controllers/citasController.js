@@ -199,8 +199,37 @@ class CitasController{
         }
     }
 
+    obtenerHorarios(req, res) {
+        try {
+            const sql = `
+                SELECT 
+                    h.idHorario, 
+                    CONCAT(
+                        CONCAT(uMedico.nombres, " ", uMedico.apellidos),
+                        " - ",
+                        CONCAT("Sala ", s.idSalaConsulta, " Nivel ", s.nivel)
+                    ) AS Horario
+                FROM horario h
+                JOIN medico m ON h.idMedico = m.idMedico 
+                JOIN usuario uMedico ON m.idUsuario = uMedico.idUsuario 
+                JOIN salaconsulta s ON s.idSalaConsulta = h.idSala;
+            `;
 
+            db.query(sql, (err, results) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar los horarios.", details: err });
+                }
 
+                if (results.length === 0) {
+                    return res.status(200).json({ mensaje: "No hay horarios disponibles." });
+                }
+
+                return res.status(200).json(results);
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
 
     
 }

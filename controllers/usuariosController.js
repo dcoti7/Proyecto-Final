@@ -26,36 +26,50 @@ class UsuariosController{
     async ingresar(req, res) {
         try {
             const { username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado } = req.body;
-
+    
             // Validaciones de entrada
             if (!username || !password || !dpi || !nombres || !apellidos || !fechaNacimiento || !email || !numero || !idRol || !estado) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
-
+    
+            // Verificar si el usuario ya existe
+            const userExists = await new Promise((resolve, reject) => {
+                db.query('SELECT * FROM usuario WHERE username = ?', [username], (err, results) => {
+                    if (err) reject(err);
+                    else resolve(results.length > 0);
+                });
+            });
+    
+            if (userExists) {
+                return res.status(409).json({ error: "El usuario ya está registrado." });
+            }
+    
             // Encriptar la contraseña antes de guardarla
-            const hashedPassword = await bcrypt.hash(password, 10); // 10 es el número de rondas de encriptación (puede ajustarse)
-
+            const hashedPassword = await bcrypt.hash(password, 10);
+    
             // Inserción con la contraseña encriptada
-            db.query('INSERT INTO usuario(username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
-                [username, hashedPassword, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado],
-                (err, rows) => {
-                    if (err) {
-                        // Verificar si es un error de clave foránea o duplicación
-                        if (err.code === 'ER_NO_REFERENCED_ROW_2') {
-                            return res.status(400).json({ error: "El idRol no existen en la tabla correspondiente." });
-                        }
-                        if (err.code === 'ER_DUP_ENTRY') {
-                            return res.status(400).json({ error: "El username ya está registrado." });
-                        }
-                        return res.status(400).json({ error: "Error al insertar el registro.", details: err });
+            await new Promise((resolve, reject) => {
+                db.query(
+                    'INSERT INTO usuario(username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
+                    [username, hashedPassword, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado],
+                    (err, result) => {
+                        if (err) reject(err);
+                        else resolve(result);
                     }
-                    if (rows.affectedRows === 1) {
-                        return res.status(200).json({ respuesta: "Registro ingresado con éxito" });
-                    }
-                }
-            );
+                );
+            });
+    
+            return res.status(201).json({ respuesta: "Usuario registrado con éxito" });
+    
         } catch (err) {
-            return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
+            if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+                return res.status(400).json({ error: "El idRol no existe en la tabla correspondiente." });
+            }
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(409).json({ error: "El username ya está registrado." });
+            }
+            console.error(err);
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
         }
     }
 
@@ -180,8 +194,8 @@ class UsuariosController{
         }
     
         try {
-            // Buscar el usuario en la base de datos solo obteniendo el username, password e idRol
-            db.query('SELECT username, password, idRol FROM usuario WHERE username = ?', [username], async (err, data) => {
+            // Buscar el usuario en la base de datos, excluyendo password y estado
+            db.query('SELECT idUsuario, username, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol FROM usuario WHERE username = ?', [username], async (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al consultar la base de datos.", details: err });
                 }
@@ -193,20 +207,26 @@ class UsuariosController{
     
                 const usuario = data[0];
     
-                // Asegurarse de que el campo 'password' exista
-                if (!usuario.password) {
-                    return res.status(500).json({ error: "Error interno: no se pudo recuperar la contraseña del usuario." });
-                }
+                // Obtener la contraseña del usuario para la verificación
+                db.query('SELECT password FROM usuario WHERE username = ?', [username], async (err, passwordData) => {
+                    if (err) {
+                        return res.status(500).json({ error: "Error al verificar la contraseña.", details: err });
+                    }
     
-                // Comparar la contraseña ingresada con la encriptada
-                const match = await bcrypt.compare(password, usuario.password);
+                    if (passwordData.length === 0 || !passwordData[0].password) {
+                        return res.status(500).json({ error: "Error interno: no se pudo recuperar la contraseña del usuario." });
+                    }
     
-                if (!match) {
-                    return res.status(401).json({ error: "Contraseña incorrecta." });
-                }
+                    // Comparar la contraseña ingresada con la encriptada
+                    const match = await bcrypt.compare(password, passwordData[0].password);
     
-                // Si la contraseña coincide, devolver únicamente el idRol
-                return res.status(200).json({ idRol: usuario.idRol });
+                    if (!match) {
+                        return res.status(401).json({ error: "Contraseña incorrecta." });
+                    }
+    
+                    // Si la contraseña coincide, devolver todos los campos excepto password y estado
+                    return res.status(200).json(usuario);
+                });
             });
         } catch (err) {
             return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
@@ -234,9 +254,6 @@ class UsuariosController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
-    
-
-
     
 }
 
