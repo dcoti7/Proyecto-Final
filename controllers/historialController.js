@@ -156,6 +156,50 @@ class HistorialController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
+
+    historialMedico(req, res) {
+        const { id } = req.params;
+
+        try {
+            // Validar que el id sea un número
+            if (isNaN(id)) {
+                return res.status(400).json({ error: "El id debe ser un número." });
+            }
+
+            // Consulta SQL
+            const sql = `
+                SELECT h.idHistorial, p.idUsuario, 
+                       CONCAT(p.nombres, " ", p.apellidos) AS Paciente, 
+                       CONCAT(m.nombres, " ", m.apellidos) AS Medico, 
+                       h.idCita, es.nombre AS Especialidad, 
+                       c.fechaCita 
+                FROM historial h
+                JOIN usuario p ON p.idUsuario = h.idPaciente
+                JOIN cita c ON c.idCita = h.idCita
+                JOIN medico e ON e.idMedico = c.idMedico
+                JOIN usuario m ON m.idUsuario = e.idMedico
+                JOIN especialidad es ON e.idEspecialidad = es.idEspecialidad
+                WHERE h.idHistorial = ?;
+            `;
+
+            // Ejecutar la consulta
+            db.query(sql, [id], (err, data) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al realizar la consulta.", details: err });
+                }
+
+                // Si no se encuentra el registro
+                if (data.length === 0) {
+                    return res.status(404).json({ error: "Registro de historial no encontrado." });
+                }
+
+                // Si se encuentra el registro, devolverlo
+                return res.status(200).json(data);
+            });
+        } catch (err) {
+            return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
     
 }
 

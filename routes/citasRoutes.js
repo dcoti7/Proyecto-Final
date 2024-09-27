@@ -9,6 +9,7 @@ citasRouter
 
 citasRouter.get('/obtenerCitas', citas.obtenerCitas);
 citasRouter.get('/obtenerHorarios', citas.obtenerHorarios);
+citasRouter.get('/citaPaciente/:id', citas.consultaPaciente);
 
 citasRouter
     .route("/:id")

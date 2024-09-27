@@ -231,6 +231,42 @@ class CitasController{
         }
     }
 
+    consultaPaciente(req, res) {
+        const { id } = req.params;
+
+        try {
+            // Validar que el id sea un número
+            if (isNaN(id)) {
+                return res.status(400).json({ error: "El idPaciente debe ser un número." });
+            }
+
+            // Consulta SQL para obtener las citas del paciente
+            const sql = `
+                SELECT * 
+                FROM cita 
+                WHERE idPaciente = ? 
+                LIMIT 0, 1000;
+            `;
+
+            // Ejecutar la consulta
+            db.query(sql, [id], (err, data) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al realizar la consulta.", details: err });
+                }
+
+                // Si no se encuentran registros
+                if (data.length === 0) {
+                    return res.status(404).json({ error: "No se encontraron citas para el paciente especificado." });
+                }
+
+                // Si se encuentran registros, devolverlos
+                return res.status(200).json(data);
+            });
+        } catch (err) {
+            return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
     
 }
 

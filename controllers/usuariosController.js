@@ -83,18 +83,6 @@ class UsuariosController{
             if (!username || !password || !dpi || !nombres || !apellidos || !fechaNacimiento || !email || !numero || !idRol || !estado) {
                 return res.status(400).json({ error: "Todos los campos son requeridos." });
             }
-    
-            // Validar que idPersona, idRol e id sean números
-           /*  if (isNaN(idPersona) || isNaN(idRol) || isNaN(id)) {
-                return res.status(400).json({ error: "Los campos idPersona, idRol e id deben ser números." });
-            } */
-    
-            // Validar longitud de username
-           /*  if (username.length > 50) {
-                return res.status(400).json({ error: "El username debe tener máximo 50 caracteres." });
-            } */
-    
-            // Actualización
             db.query('UPDATE usuario SET username = ?, password = ?, dpi = ?, nombres = ?, apellidos = ?, fechaNacimiento = ?, email = ?, numero = ?, idRol = ?, estado = ? WHERE idUsuario = ?',
                 [username, password, dpi, nombres, apellidos, fechaNacimiento, email, numero, idRol, estado, id],
                 (err, rows) => {
@@ -248,6 +236,41 @@ class UsuariosController{
                 }
     
                 // Si hay usuarios, devolverlos
+                return res.status(200).json(data);
+            });
+        } catch (err) {
+            return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
+    usuariosRol(req, res) {
+        const { id } = req.params;
+
+        try {
+            // Validar que el id sea un número
+            if (isNaN(id)) {
+                return res.status(400).json({ error: "El idRol debe ser un número." });
+            }
+
+            // Consulta SQL para obtener los nombres de usuarios con el idRol variable
+            const sql = `
+                SELECT CONCAT(nombres, " ", apellidos) AS Nombre 
+                FROM usuario 
+                WHERE idRol = ?;
+            `;
+
+            // Ejecutar la consulta
+            db.query(sql, [id], (err, data) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al realizar la consulta.", details: err });
+                }
+
+                // Si no se encuentran registros
+                if (data.length === 0) {
+                    return res.status(404).json({ error: "No se encontraron usuarios con el rol especificado." });
+                }
+
+                // Si se encuentran registros, devolverlos
                 return res.status(200).json(data);
             });
         } catch (err) {
