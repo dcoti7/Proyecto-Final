@@ -245,31 +245,31 @@ class UsuariosController{
 
     usuariosRol(req, res) {
         const { id } = req.params;
-
+    
         try {
             // Validar que el id sea un número
             if (isNaN(id)) {
                 return res.status(400).json({ error: "El idRol debe ser un número." });
             }
-
-            // Consulta SQL para obtener los nombres de usuarios con el idRol variable
+    
+            // Consulta SQL para obtener el idUsuario y nombres de usuarios con el idRol variable
             const sql = `
-                SELECT CONCAT(nombres, " ", apellidos) AS Nombre 
+                SELECT idUsuario, CONCAT(nombres, " ", apellidos) AS Nombre 
                 FROM usuario 
                 WHERE idRol = ?;
             `;
-
+    
             // Ejecutar la consulta
             db.query(sql, [id], (err, data) => {
                 if (err) {
                     return res.status(400).json({ error: "Error al realizar la consulta.", details: err });
                 }
-
+    
                 // Si no se encuentran registros
                 if (data.length === 0) {
                     return res.status(404).json({ error: "No se encontraron usuarios con el rol especificado." });
                 }
-
+    
                 // Si se encuentran registros, devolverlos
                 return res.status(200).json(data);
             });

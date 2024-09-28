@@ -158,7 +158,7 @@ class CitasController{
     } 
 
 
-    async obtenerCitas(req, res) {
+    /* async obtenerCitas(req, res) {
         try {
             // Consulta SQL para obtener la información de las citas
             const sql = `
@@ -197,7 +197,48 @@ class CitasController{
         } catch (err) {
             return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
         }
-    }
+    } */
+
+        async obtenerCitas(req, res) {
+            try {
+                const { id } = req.params;  
+        
+                // Validar que el idMedico sea un número
+                if (isNaN(id)) {
+                    return res.status(400).json({ error: "El idMedico debe ser un número." });
+                }
+        
+                // Consulta SQL actualizada para obtener los horarios y detalles de la sala
+                const sql = `
+                    SELECT 
+                        h.idHorario, 
+                        CONCAT("Sala ", h.idSala, " Nivel ", s.nivel) AS Horario
+                    FROM 
+                        horario h
+                    JOIN 
+                        salaconsulta s ON s.idSalaConsulta = h.idSala
+                    WHERE 
+                        h.idMedico = ?;  
+                `;
+        
+                // Realizar la consulta a la base de datos, usando idMedico como parámetro
+                db.query(sql, [id], (err, results) => {
+                    if (err) {
+                        return res.status(400).json({ error: "Error al consultar las citas.", details: err });
+                    }
+        
+                    // Verificar si hay resultados
+                    if (results.length === 0) {
+                        return res.status(200).json({ mensaje: "No hay citas disponibles para este médico." });
+                    }
+        
+                    // Devolver los resultados de la consulta
+                    return res.status(200).json(results);
+                });
+            } catch (err) {
+                return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+            }
+        }
 
     obtenerHorarios(req, res) {
         try {
