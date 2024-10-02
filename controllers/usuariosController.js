@@ -546,7 +546,7 @@ class UsuariosController {
         }
     } */
 
-  /* consultarRecetasPorPaciente(req, res) {
+  consultarRecetasPorPaciente(req, res) {
     const { idUsuario } = req.params; // Obtener el idUsuario del paciente de los parámetros de la URL
 
     try {
@@ -605,59 +605,7 @@ class UsuariosController {
         .status(500)
         .json({ error: "Error interno del servidor.", details: err.message });
     }
-  } */
-
-    consultarRecetasPorPaciente(req, res) {
-        const { idUsuario } = req.params; // Obtener el idUsuario del paciente de los parámetros de la URL
-        
-        try {
-          // Consulta SQL para obtener las recetas del paciente
-          const sql = `
-            SELECT 
-                r.idReceta, 
-                c.idCita,  
-                CONCAT(p.nombres, " ", p.apellidos) AS Paciente, 
-                r.descripcion 
-            FROM 
-                receta r
-            JOIN 
-                cita c ON r.idCita = c.idCita
-            JOIN 
-                usuario p ON c.idPaciente = p.idUsuario
-            WHERE 
-                p.idUsuario = ?;
-          `;
-      
-          // Realizar la consulta a la base de datos
-          db.query(sql, [idUsuario], (err, results) => {
-            if (err) {
-              // Manejo de errores en la consulta SQL
-              return res
-                .status(400)
-                .json({
-                  error: "Error al consultar las recetas del paciente.",
-                  details: err,
-                });
-            }
-      
-            // Verificar si se encontraron resultados
-            if (results.length === 0) {
-              return res
-                .status(404)
-                .json({ error: "No hay recetas para este paciente." });
-            }
-      
-            // Si se encuentran recetas, devolver los resultados
-            return res.status(200).json(results);
-          });
-        } catch (err) {
-          // Manejo de errores internos del servidor
-          return res
-            .status(500)
-            .json({ error: "Error interno del servidor.", details: err.message });
-        }
-      }
-      
+  }
 
   consultarPacienteLogin(req, res) {
     const { idUsuario } = req.params; // Obtener el idUsuario de los parámetros de la URL
