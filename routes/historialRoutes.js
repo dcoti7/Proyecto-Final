@@ -8,6 +8,7 @@ historialRouter
     .get(historial.consultar)
 
 historialRouter.get('/historialMedico/:id', historial.historialMedico);
+historialRouter.get('/historialPaciente/:id', historial.historialPorPaciente);
 historialRouter
     .route("/:id")
     .get(historial.consultarId)

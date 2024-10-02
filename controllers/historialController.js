@@ -162,9 +162,9 @@ class HistorialController{
 
         try {
             // Validar que el id sea un número
-            if (isNaN(id)) {
+            /* if (isNaN(id)) {
                 return res.status(400).json({ error: "El id debe ser un número." });
-            }
+            } */
 
             // Consulta SQL
             const sql = `
@@ -200,6 +200,62 @@ class HistorialController{
             return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
         }
     }
+
+
+    historialPorPaciente(req, res) {
+        const { idUsuario } = req.params; // Obtener el idUsuario del paciente de los parámetros de la URL
+    
+        try {
+            // Validar que el idUsuario sea un número
+            /* if (isNaN(idUsuario)) {
+                return res.status(400).json({ error: "El idUsuario debe ser un número." });
+            } */
+    
+            // Consulta SQL para obtener el historial del paciente
+            const sql = `
+                SELECT 
+                    h.idHistorial, 
+                    p.idUsuario, 
+                    CONCAT(p.nombres, " ", p.apellidos) AS Paciente, 
+                    CONCAT(m.nombres, " ", m.apellidos) AS Medico, 
+                    h.idCita, 
+                    es.nombre AS Especialidad, 
+                    c.fechaCita 
+                FROM 
+                    historial h
+                JOIN 
+                    usuario p ON p.idUsuario = h.idPaciente
+                JOIN 
+                    cita c ON c.idCita = h.idCita
+                JOIN 
+                    medico e ON e.idMedico = c.idMedico
+                JOIN 
+                    usuario m ON m.idUsuario = e.idUsuario  
+                JOIN 
+                    especialidad es ON e.idEspecialidad = es.idEspecialidad
+                WHERE 
+                    p.idUsuario = ?;
+            `;
+    
+            // Realizar la consulta a la base de datos
+            db.query(sql, [idUsuario], (err, results) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar el historial del paciente.", details: err });
+                }
+    
+                // Verificar si hay resultados
+                if (results.length === 0) {
+                    return res.status(200).json({ mensaje: "No se encontró historial para este paciente." });
+                }
+    
+                // Devolver los resultados de la consulta
+                return res.status(200).json(results);
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
     
 }
 

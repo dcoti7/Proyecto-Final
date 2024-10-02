@@ -253,9 +253,9 @@ class MedicosController{
     
         try {
             // Validar que el idUsuario sea un número
-            if (isNaN(idUsuario)) {
+           /*  if (isNaN(idUsuario)) {
                 return res.status(400).json({ error: "El idUsuario debe ser un número." });
-            }
+            } */
     
             // Consulta SQL para obtener el médico por usuario
             const sql = `

@@ -158,7 +158,7 @@ class CitasController{
     } 
 
 
-    async obtenerCitas(req, res) {
+    async citasGenerales(req, res) {
         try {
             // Consulta SQL para obtener la información de las citas
             const sql = `
@@ -204,9 +204,9 @@ class CitasController{
                 const { id } = req.params;  
         
                 // Validar que el idMedico sea un número
-                if (isNaN(id)) {
+                /* if (isNaN(id)) {
                     return res.status(400).json({ error: "El idMedico debe ser un número." });
-                }
+                } */
         
                 // Consulta SQL actualizada para obtener los horarios y detalles de la sala
                 const sql = `
