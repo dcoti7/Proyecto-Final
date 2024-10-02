@@ -331,7 +331,7 @@ class UsuariosController{
 
 
 
-    consultarRecetasPorPaciente(req, res) {
+    /* consultarRecetasPorPaciente(req, res) {
         const { idUsuario } = req.params; // Obtener el idUsuario del paciente de los parámetros de la URL
     
         try {
@@ -374,7 +374,50 @@ class UsuariosController{
         } catch (err) {
             return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
         }
-    }
+    } */
+
+        consultarRecetasPorPaciente(req, res) {
+            const { idUsuario } = req.params;
+        
+            try {
+                const id = parseInt(idUsuario);
+        
+                if (isNaN(id)) {
+                    return res.status(400).json({ error: "El idUsuario debe ser un número." });
+                }
+        
+                const sql = `
+                    SELECT 
+                        r.idReceta, 
+                        c.idCita,  
+                        CONCAT(p.nombres, " ", p.apellidos) AS Paciente, 
+                        r.descripcion 
+                    FROM 
+                        receta r
+                    JOIN 
+                        cita c ON r.idCita = c.idCita
+                    JOIN 
+                        usuario p ON c.idUsuario = p.idUsuario
+                    WHERE 
+                        p.idUsuario = ?;
+                `;
+        
+                db.query(sql, [id], (err, results) => {
+                    if (err) {
+                        return res.status(400).json({ error: "Error al consultar las recetas del paciente.", details: err });
+                    }
+        
+                    if (results.length === 0) {
+                        return res.status(200).json({ mensaje: "No hay recetas para este paciente." });
+                    }
+        
+                    return res.status(200).json(results);
+                });
+            } catch (err) {
+                return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+            }
+        }
+        
 
 
     consultarPacienteLogin(req, res) {
