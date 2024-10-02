@@ -126,6 +126,62 @@ class MedicosController{
         }
     }
 
+    consultarCitas(req, res) {
+        const { idUsuario } = req.params; // Obtener el idUsuario de los parámetros de la URL
+    
+        try {
+            // Validar que el idUsuario sea un número
+            if (isNaN(idUsuario)) {
+                return res.status(400).json({ error: "El idUsuario debe ser un número." });
+            }
+    
+            // Consulta SQL para obtener las citas
+            const sql = `
+                SELECT 
+                    c.idCita, 
+                    CONCAT(p.nombres, " ", p.apellidos) AS Paciente, 
+                    CONCAT(uMedico.nombres, " ", uMedico.apellidos) AS Medico, 
+                    c.fechaCita, 
+                    c.estado 
+                FROM 
+                    cita c 
+                JOIN 
+                    usuario p ON c.idPaciente = p.idUsuario 
+                JOIN 
+                    medico m ON c.idMedico = m.idMedico 
+                JOIN 
+                    usuario uMedico ON m.idUsuario = uMedico.idUsuario 
+                JOIN 
+                    horario h ON c.idHorario = h.idHorario
+                WHERE 
+                    uMedico.idUsuario = ?;
+            `;
+    
+            // Realizar la consulta a la base de datos
+            db.query(sql, [idUsuario], (err, results) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar las citas.", details: err });
+                }
+    
+                // Verificar si hay resultados
+                if (results.length === 0) {
+                    return res.status(200).json({ mensaje: "No hay citas para este médico." });
+                }
+    
+                // Devolver los resultados de la consulta
+                return res.status(200).json(results);
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
+
+
+
+
+
+
     borrar(req, res) {
         const { id } = req.params;
     
@@ -182,6 +238,50 @@ class MedicosController{
                 // Verificar si hay resultados
                 if (results.length === 0) {
                     return res.status(200).json({ mensaje: "No hay médicos disponibles." });
+                }
+    
+                // Devolver los resultados de la consulta
+                return res.status(200).json(results);
+            });
+        } catch (err) {
+            return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
+    consultarMedicoLogin(req, res) {
+        const { idUsuario } = req.params; // Obtener el idUsuario del médico desde los parámetros de la URL
+    
+        try {
+            // Validar que el idUsuario sea un número
+            if (isNaN(idUsuario)) {
+                return res.status(400).json({ error: "El idUsuario debe ser un número." });
+            }
+    
+            // Consulta SQL para obtener el médico por usuario
+            const sql = `
+                SELECT 
+                    m.idMedico, 
+                    CONCAT(uMedico.nombres, " ", uMedico.apellidos) AS Medico,
+                    e.nombre AS Especialidad
+                FROM 
+                    medico m 
+                JOIN 
+                    usuario uMedico ON m.idUsuario = uMedico.idUsuario
+                JOIN 
+                    especialidad e ON m.idEspecialidad = e.idEspecialidad
+                WHERE 
+                    uMedico.idUsuario = ?;
+            `;
+    
+            // Realizar la consulta a la base de datos
+            db.query(sql, [idUsuario], (err, results) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al consultar el médico.", details: err });
+                }
+    
+                // Verificar si hay resultados
+                if (results.length === 0) {
+                    return res.status(200).json({ mensaje: "No se encontró el médico para este usuario." });
                 }
     
                 // Devolver los resultados de la consulta

@@ -10,6 +10,9 @@ usuariosRouter
 usuariosRouter.post('/login', usuarios.login);
 usuariosRouter.get('/pacientes', usuarios.consultarPacientes)
 usuariosRouter.get('/usuariosRol/:id', usuarios.usuariosRol)
+usuariosRouter.get('/consultarCitas/:id', usuarios.consultarCitas)
+usuariosRouter.get('/consultarPacienteLogin/:id', usuarios.consultarPacienteLogin)
+usuariosRouter.get('/consultarRecetasPorPaciente/:id', usuarios.consultarRecetasPorPaciente)
 
 usuariosRouter
   .route("/:id")

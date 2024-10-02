@@ -158,7 +158,7 @@ class CitasController{
     } 
 
 
-    /* async obtenerCitas(req, res) {
+    async obtenerCitas(req, res) {
         try {
             // Consulta SQL para obtener la información de las citas
             const sql = `
@@ -197,7 +197,7 @@ class CitasController{
         } catch (err) {
             return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
         }
-    } */
+    }
 
         async obtenerCitas(req, res) {
             try {

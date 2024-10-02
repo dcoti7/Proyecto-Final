@@ -8,6 +8,7 @@ citasRouter
     .post(citas.ingresar)
 
 citasRouter.get('/obtenerCitas/:id', citas.obtenerCitas);
+citasRouter.get('/obtenerCitas', citas.obtenerCitas);
 citasRouter.get('/obtenerHorarios', citas.obtenerHorarios);
 citasRouter.get('/citaPaciente/:id', citas.consultaPaciente);
 
