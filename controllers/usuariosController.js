@@ -331,7 +331,7 @@ class UsuariosController{
 
 
 
-    /* consultarRecetasPorPaciente(req, res) {
+   /*  consultarRecetasPorPaciente(req, res) {
         const { idUsuario } = req.params; // Obtener el idUsuario del paciente de los parámetros de la URL
     
         try {
@@ -377,15 +377,17 @@ class UsuariosController{
     } */
 
         consultarRecetasPorPaciente(req, res) {
-            const { idUsuario } = req.params;
+            const { idUsuario } = req.params; // Obtener el idUsuario del paciente de los parámetros de la URL
         
             try {
                 const id = parseInt(idUsuario);
         
-                if (isNaN(id)) {
+                // Validar que el idUsuario sea un número
+                /* if (isNaN(id)) {
                     return res.status(400).json({ error: "El idUsuario debe ser un número." });
-                }
+                } */
         
+                // Consulta SQL para obtener las recetas del paciente
                 const sql = `
                     SELECT 
                         r.idReceta, 
@@ -397,23 +399,28 @@ class UsuariosController{
                     JOIN 
                         cita c ON r.idCita = c.idCita
                     JOIN 
-                        usuario p ON c.idUsuario = p.idUsuario
+                        usuario p ON c.idPaciente = p.idUsuario
                     WHERE 
                         p.idUsuario = ?;
                 `;
         
+                // Realizar la consulta a la base de datos
                 db.query(sql, [id], (err, results) => {
                     if (err) {
+                        // Manejo de errores en la consulta SQL
                         return res.status(400).json({ error: "Error al consultar las recetas del paciente.", details: err });
                     }
         
+                    // Verificar si se encontraron resultados
                     if (results.length === 0) {
-                        return res.status(200).json({ mensaje: "No hay recetas para este paciente." });
+                        return res.status(404).json({ error: "No hay recetas para este paciente." });
                     }
         
+                    // Si se encuentran recetas, devolver los resultados
                     return res.status(200).json(results);
                 });
             } catch (err) {
+                // Manejo de errores internos del servidor
                 return res.status(500).json({ error: "Error interno del servidor.", details: err.message });
             }
         }
