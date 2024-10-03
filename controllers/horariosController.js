@@ -176,7 +176,7 @@ class HorariosController{
                 SELECT 
                     h.idHorario, 
                     CONCAT(uMedico.nombres, ' ', uMedico.apellidos) AS Medico, 
-                    CONCAT('Sala ', h.idSala, ' Nivel ', s.nivel) AS Sala 
+                    CONCAT('Sala ', h.idSala, ' Nivel ', s.nivel) AS Horario 
                 FROM 
                     horario h 
                 JOIN 
