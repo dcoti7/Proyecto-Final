@@ -256,6 +256,52 @@ class HistorialController{
         }
     }
 
+
+    historialGeneral(req, res) {
+        try {
+            // Consulta SQL para obtener el historial general
+            const sql = `
+                SELECT 
+                    h.idHistorial, 
+                    p.idUsuario, 
+                    CONCAT(p.nombres, " ", p.apellidos) AS Paciente, 
+                    CONCAT(m.nombres, " ", m.apellidos) AS Medico, 
+                    h.idCita, 
+                    es.nombre AS Especialidad, 
+                    c.fechaCita 
+                FROM 
+                    historial h
+                JOIN 
+                    usuario p ON p.idUsuario = h.idPaciente
+                JOIN 
+                    cita c ON c.idCita = h.idCita
+                JOIN 
+                    medico e ON e.idMedico = c.idMedico
+                JOIN 
+                    usuario m ON m.idUsuario = e.idMedico
+                JOIN 
+                    especialidad es ON e.idEspecialidad = es.idEspecialidad;
+            `;
+            
+            // Ejecutar la consulta
+            db.query(sql, (err, data) => {
+                if (err) {
+                    return res.status(400).json({ error: "Error al realizar la consulta.", details: err });
+                }
+    
+                // Verificar si hay registros
+                if (data.length === 0) {
+                    return res.status(404).json({ mensaje: "No se encontraron registros en la tabla." });
+                }
+    
+                // Devolver los resultados de la consulta
+                return res.status(200).json(data);
+            });
+        } catch (err) {
+            return res.status(500).send({ error: "Error interno del servidor.", details: err.message });
+        }
+    }
+
     
 }
 
