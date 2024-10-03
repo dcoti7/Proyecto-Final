@@ -245,7 +245,7 @@ class HistorialController{
     
                 // Verificar si hay resultados
                 if (results.length === 0) {
-                    return res.status(200).json({ mensaje: "No se encontró historial para este paciente." });
+                    return res.status(400).json({ mensaje: "No se encontró historial para este paciente." });
                 }
     
                 // Devolver los resultados de la consulta

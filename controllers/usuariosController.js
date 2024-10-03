@@ -487,7 +487,8 @@ class UsuariosController {
         // Verificar si hay resultados
         if (results.length === 0) {
           return res
-            .status(200)
+          /* STATUS 200 */
+            .status(400)
             .json({ mensaje: "No hay citas para este paciente." });
         }
 

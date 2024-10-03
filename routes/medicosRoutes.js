@@ -8,8 +8,8 @@ medicosRouter
   .get(medicos.consultar);
 
   medicosRouter.get('/consultarMedico', medicos.obtenerMedicos);
-  medicosRouter.get('/consultarCitas/:id', medicos.consultarCitas);
-  medicosRouter.get('/consultarMedicoLogin/:id', medicos.consultarMedicoLogin);
+  medicosRouter.get('/consultarCitas/:idUsuario', medicos.consultarCitas);
+  medicosRouter.get('/consultarMedicoLogin/:idUsuario', medicos.consultarMedicoLogin);
   medicosRouter
   .route("/:id")
   .get(medicos.consultarId)
